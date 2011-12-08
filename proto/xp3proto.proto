@@ -1,0 +1,22 @@
+package xp3;
+
+message Request {
+  enum RequestType {
+    EXIT = 0;
+	GET_EXPORT_ADDR = 1;
+	SET_EXPORT_ADDR = 2;
+	INIT_PNG_PLUGIN = 3;
+	EXRACT_FILE = 4;
+  }
+  
+  required RequestType type = 1;
+  optional int32 expAddr = 2;
+  repeated string fileToExtract = 3;
+  optional string extractPath = 4;
+  optional string pngPluginPath = 5;
+}
+
+message Answer {
+	required int32 retVal = 1;
+	optional int32 expAddr = 2;
+}
