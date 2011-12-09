@@ -1,3 +1,5 @@
+import sys
+import traceback
 import wx
 import xp3start
 
@@ -10,9 +12,9 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnStart, self.startButton)
         self.sizerBack.Add(self.startButton)
         
-        self.advanceButton = wx.Button(self, label = "I need advanced function")
-        self.Bind(wx.EVT_BUTTON, self.OnAdvanceStart, self.advanceButton)
-        self.sizerBack.Add(self.advanceButton)
+        #self.advanceButton = wx.Button(self, label = "I need advanced function")
+        #self.Bind(wx.EVT_BUTTON, self.OnAdvanceStart, self.advanceButton)
+        #self.sizerBack.Add(self.advanceButton)
 
         self.logList = wx.TextCtrl(self, size=(500,500), style = wx.TE_MULTILINE | wx.TE_READONLY)
         self.sizerBack.Add(self.logList)
@@ -28,10 +30,11 @@ class MainFrame(wx.Frame):
         if ret==wx.ID_OK:
             fileName = fileDlg.GetPath()
             fileDlg.Destroy()
-            try:
-                xp3start.start(fileName, self.addLog)
-            except Exception,e:
-                self.addLog("process failed.[%s]" % str(e))
+            #try:
+            xp3start.start(fileName, self.addLog)
+            #except Exception,e:
+            #    self.addLog("process failed.[%s]" % str(e))
+            #    raise e
         self.enableButtons()
 		
     def OnAdvanceStart(self, e):
@@ -41,11 +44,11 @@ class MainFrame(wx.Frame):
 
     def disableButtons(self):
         self.startButton.Disable()
-        self.advanceButton.Disable()
+        #self.advanceButton.Disable()
 
     def enableButtons(self):
         self.startButton.Enable()
-        self.advanceButton.Enable()
+        #self.advanceButton.Enable()
     
     def addLog(self, str):
         self.logList.AppendText(str + '\n')

@@ -1,3 +1,5 @@
+option optimize_for = LITE_RUNTIME;
+
 package xp3;
 
 message Request {
@@ -7,6 +9,7 @@ message Request {
 	SET_EXPORT_ADDR = 2;
 	INIT_PNG_PLUGIN = 3;
 	EXRACT_FILE = 4;
+	ALLOC_CONSOLE = 5;
   }
   
   required RequestType type = 1;
@@ -16,7 +19,7 @@ message Request {
   optional string pngPluginPath = 5;
 }
 
-message Answer {
+message Response {
 	required int32 retVal = 1;
 	optional int32 expAddr = 2;
 }
