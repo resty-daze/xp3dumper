@@ -4,4 +4,12 @@
  cd build
  cmake .. -G "MinGW Makefiles"
  mingw32-make
- mingw32-make ui
+
+2.pack:
+  use ui/ui-dist as main path
+  copy tools/*.{tpm,dll,exe} to ui/ui-dist/tools
+  check ui/ui-dist/libzmq.dll
+
+3.test
+
+4.write release-notes
