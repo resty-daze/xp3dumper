@@ -30,11 +30,12 @@ class MainFrame(wx.Frame):
         if ret==wx.ID_OK:
             fileName = fileDlg.GetPath()
             fileDlg.Destroy()
-            #try:
-            xp3start.start(fileName, self.addLog)
-            #except Exception,e:
-            #    self.addLog("process failed.[%s]" % str(e))
-            #    raise e
+            try:
+                xp3start.start(fileName, self.addLog)
+            except Exception,e:
+                self.addLog("process failed.")
+                self.addLog(traceback.format_exc(5))
+
         self.enableButtons()
 		
     def OnAdvanceStart(self, e):
