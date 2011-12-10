@@ -16,3 +16,7 @@ target_link_libraries(!get_addr.tpm protobuf-lite zmq)
 
 # dllinject
 add_executable(dllinject dllinject.cpp)
+
+# dumper.dll
+add_library(dumper.dll SHARED dumper.cpp stub/tp_stub.cpp zmq_wrapper.cpp ${CMAKE_CURRENT_BINARY_DIR}/xp3proto.pb.cc)
+target_link_libraries(dumper.dll protobuf-lite zmq)

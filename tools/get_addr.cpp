@@ -2,7 +2,7 @@
 #include "zmq_wrapper.h"
 
 extern "C" HRESULT _stdcall V2Link(DWORD exporter) {
-    void *responder = rep_sock ("tcp://localhost:10010");
+    void *responder = rep_sock ("tcp://*:10010");
     
     while (true) {
         xp3::Request req;

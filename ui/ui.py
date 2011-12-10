@@ -31,7 +31,7 @@ class MainFrame(wx.Frame):
             fileName = fileDlg.GetPath()
             fileDlg.Destroy()
             try:
-                xp3start.start(fileName, self.addLog)
+                xp3start.start(fileName, self.addLog, self.alert)
             except Exception,e:
                 self.addLog("process failed.")
                 self.addLog(traceback.format_exc(5))
@@ -51,8 +51,16 @@ class MainFrame(wx.Frame):
         self.startButton.Enable()
         #self.advanceButton.Enable()
     
-    def addLog(self, str):
-        self.logList.AppendText(str + '\n')
+    def addLog(self, msg):
+        self.logList.AppendText(msg + '\n')
+
+    def alert(self, msg):
+        dlg = wx.MessageDialog(self, 
+                               message=msg,
+                               caption="xp3ui",
+                               style=wx.OK)
+        dlg.ShowModal()
+        dlg.Destroy()
 		
 if __name__=="__main__":
     app = wx.App(False)
