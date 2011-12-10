@@ -22,6 +22,7 @@ bool send_res(void* sock, const xp3::Response & res) {
 
 void* rep_sock(const char* addr) {
     static void *context = zmq_init(1);
-	void * sock = zmq_socket (context, ZMQ_REP);
-	zmq_bind (sock, addr);
+    void * sock = zmq_socket (context, ZMQ_REP);
+    zmq_bind (sock, addr);
+    return sock;
 }

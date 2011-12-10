@@ -4,6 +4,7 @@ import shutil
 import zmq
 
 import xp3proto_pb2
+import getlist
 
 class Workflow:
     def __init__(self, fileName, log):
@@ -14,6 +15,11 @@ class Workflow:
         self.context = zmq.Context()
         addr = self.getAddr()
         self.log("export_addr=%x" % addr)
+        lists = getlist.getList()
+        if len(lists) == 0:
+            self.log("Finished: file list is empty.")
+            return False
+        self.log("load file lists[%s]" % str(map(lambda x : x[0], lists)))
 
     def getAddr(self):
         self.log("try to get export addr")
