@@ -1,6 +1,5 @@
 #include <windows.h>
 #include <zmq.h>
-#include "stub/tp_stub.h"
 #include "xp3proto.pb.h"
 
 static bool recv_req(void* sock, xp3::Request &req) {

@@ -14,4 +14,5 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_library(!get_addr.tpm SHARED tp_plugin.def get_addr.cpp ${CMAKE_CURRENT_BINARY_DIR}/xp3proto.pb.cc)
 target_link_libraries(!get_addr.tpm protobuf-lite zmq)
 
-#
+# dllinject
+add_executable(dllinject dllinject.cpp)
