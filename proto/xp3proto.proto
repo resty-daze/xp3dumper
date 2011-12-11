@@ -8,7 +8,7 @@ message Request {
 	GET_EXPORT_ADDR = 1;
 	SET_EXPORT_ADDR = 2;
 	INIT_PNG_PLUGIN = 3;
-	EXRACT_FILE = 4;
+	EXTRACT_FILE = 4;
 	ALLOC_CONSOLE = 5;
   }
   

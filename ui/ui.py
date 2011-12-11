@@ -1,13 +1,27 @@
 import sys
+import os
 import traceback
 import wx
 import xp3start
 
 class MainFrame(wx.Frame):
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, title="xp3dumper front-end")
+        wx.Frame.__init__(self, parent, title="xp3dumper front-end", style=wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX)
         self.sizerBack = wx.BoxSizer(wx.VERTICAL)
+		
+        self.pathSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizerBack.Add(self.pathSizer, 0, wx.EXPAND, 0)
+		
+        self.pathSizer.Add(wx.StaticText(self, label = "Path: "))
 
+        self.pathTxt = wx.TextCtrl(self)
+        self.pathTxt.SetValue(os.getcwd() + "\\output")
+        self.pathSizer.Add(self.pathTxt, wx.EXPAND)
+
+        self.selectPathButton = wx.Button(self, label = "...", size=(20, -1))
+        self.Bind(wx.EVT_BUTTON, self.selectPath, self.selectPathButton)
+        self.pathSizer.Add(self.selectPathButton)
+        
         self.startButton = wx.Button(self, label = "Start")
         self.Bind(wx.EVT_BUTTON, self.OnStart, self.startButton)
         self.sizerBack.Add(self.startButton)
@@ -22,6 +36,7 @@ class MainFrame(wx.Frame):
         self.SetSizer(self.sizerBack)
         self.SetAutoLayout(1)
         self.sizerBack.Fit(self)
+        self.sizerBack.Layout()
 		
     def OnStart(self, e):
         self.disableButtons()
@@ -31,7 +46,7 @@ class MainFrame(wx.Frame):
             fileName = fileDlg.GetPath()
             fileDlg.Destroy()
             try:
-                xp3start.start(fileName, self.addLog, self.alert)
+                xp3start.start(fileName, self.pathTxt.GetValue(), self.addLog, self.alert)
             except Exception,e:
                 self.addLog("process failed.")
                 self.addLog(traceback.format_exc(5))
@@ -60,6 +75,12 @@ class MainFrame(wx.Frame):
                                caption="xp3ui",
                                style=wx.OK)
         dlg.ShowModal()
+        dlg.Destroy()
+
+    def selectPath(self, e):
+        dlg = wx.DirDialog(self)
+        if dlg.ShowModal() == wx.ID_OK:
+            self.pathTxt.SetValue(dlg.GetPath())
         dlg.Destroy()
 		
 if __name__=="__main__":

@@ -50,13 +50,24 @@ struct ExFileRAII {
     }
 };
 /// extract a file
-static int extract_file(const char * path, // path to save, (utf-8)
+static int extract_file(int id, int total,
+                        const char * path, // path to save, (utf-8)
                         const char * name, // file to save, (utf-8)
                         string & desc) {   // error description
     wchar_t wpath[kPathLen];
     wchar_t wname[kPathLen];
     MultiByteToWideChar(CP_UTF8, 0, path, strlen(path) + 1, wpath, sizeof(wpath));
-    MultiByteToWideChar(CP_UTF8, 0, path, strlen(name) + 1, wname, sizeof(wname));
+    MultiByteToWideChar(CP_UTF8, 0, name, strlen(name) + 1, wname, sizeof(wname));
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    // printf("%s:", path);
+    // wprintf(L"%s:", wpath);
+    // printf("%s:", name);
+    printf("[");
+    SetConsoleTextAttribute( hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN );
+    printf("%5d/%d", id, total);
+    SetConsoleTextAttribute( hConsole, FOREGROUND_INTENSITY);
+    wprintf(L"]\t%s\n", wname);
     
     ExFileRAII holder;
     IStream * st = TVPCreateIStream(ttstr(wname), TJS_BS_READ);
@@ -99,8 +110,6 @@ static int extract_file(const char * path, // path to save, (utf-8)
             tmp += os;
         }
     }
-	
-    wprintf(L"%s\n", wname);
     return 0;
 }
 
@@ -127,13 +136,16 @@ int onStart_dumper(void*) {
                 // todo: add png dll handle
                 send_res(responder, res);
                 break;
-            case xp3::Request::EXRACT_FILE: {
+            case xp3::Request::EXTRACT_FILE: {
                 std::string desc("succeed");
                 int ret_val = 0;
-                for (int i = 0; ret_val == 0 && i < req.filetoextract_size(); ++i) {
-                    ret_val = extract_file(req.extractpath().c_str(), // save path
-                                            req.filetoextract(i).c_str(),
-                                            desc); // file to extract
+                int size = req.filetoextract_size();
+                for (int i = 0; ret_val == 0 && i < size; ++i) {
+                    ret_val = extract_file(i,
+                                           size,
+                                           req.extractpath().c_str(), // save path
+                                           req.filetoextract(i).c_str(),
+                                           desc); // file to extract
                 }
                 res.set_retval(ret_val);
                 res.set_description(desc);
@@ -142,6 +154,7 @@ int onStart_dumper(void*) {
                 break;
             case xp3::Request::ALLOC_CONSOLE:
                 make_console();
+                send_res(responder, res);
                 break;
             default:
                 res.set_retval(1);
