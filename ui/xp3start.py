@@ -117,11 +117,8 @@ class Workflow:
 
     def haltTarget(self):
         # request exit
-        req = xp3proto_pb2.Request()
-        req.type = xp3proto_pb2.Request.EXIT
-        self.socket.send(req.SerializeToString())
-        self.proc.wait() 
-        self.socket.close()
+        if self.proc.poll() == None:
+            self.proc.terminate()
 
 
 def start(fileName, path, log, alert):
