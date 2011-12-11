@@ -48,7 +48,8 @@ class Workflow:
         req.type  = xp3proto_pb2.Request.ALLOC_CONSOLE
         self.socket.send(req.SerializeToString())
         self.socket.recv()
-        
+        # check png dll
+        self.checkPngDll()
         # dump file
         for it in lists:
             self.dumpFileList(it[0], it[1])
@@ -119,7 +120,17 @@ class Workflow:
         # request exit
         if self.proc.poll() == None:
             self.proc.terminate()
-
+            
+    def checkPngDll(self):
+        if os.path.exists(os.getcwd() + "\\tools\\layerExSave.dll"):
+            self.log("detected tools\\layerExSave.dll")
+            req = xp3proto_pb2.Request()
+            req.type = xp3proto_pb2.Request.INIT_PNG_PLUGIN
+            req.pngPluginPath = os.getcwd() + "\\tools\\layerExSave.dll"
+            self.socket.send(req.SerializeToString())
+            res = xp3proto_pb2.Response()
+            res.ParseFromString(self.socket.recv())
+            self.log("load png dll [dll:%s][%s]" % (req.pngPluginPath, res.description))
 
 def start(fileName, path, log, alert):
     log("start to process. [Target:%s][Path:%s]" % (fileName, path))
