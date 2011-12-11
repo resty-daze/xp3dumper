@@ -11,7 +11,7 @@ class MainFrame(wx.Frame):
 		
         self.pathSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.sizerBack.Add(self.pathSizer, 0, wx.EXPAND, 0)
-		
+        
         self.pathSizer.Add(wx.StaticText(self, label = "Path: "))
 
         self.pathTxt = wx.TextCtrl(self)
@@ -21,6 +21,9 @@ class MainFrame(wx.Frame):
         self.selectPathButton = wx.Button(self, label = "...", size=(20, -1))
         self.Bind(wx.EVT_BUTTON, self.selectPath, self.selectPathButton)
         self.pathSizer.Add(self.selectPathButton)
+
+        self.addrChkBox = wx.CheckBox(self, label = "Get address by replace wuvorbis.dll")
+        self.sizerBack.Add(self.addrChkBox)
         
         self.startButton = wx.Button(self, label = "Start")
         self.Bind(wx.EVT_BUTTON, self.OnStart, self.startButton)
@@ -46,8 +49,12 @@ class MainFrame(wx.Frame):
             fileName = fileDlg.GetPath()
             fileDlg.Destroy()
             try:
+                if self.addrChkBox.GetValue():
+                    xp3start.option["addr_method"] = "dll"
+                else:
+                    xp3start.option["addr_method"] = "tpm"
                 xp3start.start(fileName, self.pathTxt.GetValue(), self.addLog, self.alert)
-            except Exception,e:
+            except Exception as e:
                 self.addLog("process failed.")
                 self.addLog(traceback.format_exc(5))
 

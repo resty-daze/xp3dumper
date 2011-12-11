@@ -8,6 +8,40 @@ import time
 import xp3proto_pb2
 import getlist
 
+option = {}
+
+class TpmAddr:
+    def __init__(self, path):
+        self.path = os.path.split(path)[0]
+
+    def setup(self):
+        # copy !get_addr.tpm to target directory
+        shutil.copy("tools/!get_addr.tpm", self.path)
+
+    def rollback(self):
+        # remove tpm file
+        os.remove(self.path + "/!get_addr.tpm")
+
+class DllAddr:
+    def __init__(self, path):
+        self.path = os.path.split(path)[0]
+    
+    def setup(self):
+        shutil.move(self.path + "/plugin/wuvorbis.dll", self.path + "/plugin/wuvorbis.dll.bak")
+        shutil.copy("tools/!get_addr.tpm", self.path + "/plugin/wuvorbis.dll")
+
+    def rollback(self):
+        if os.path.exists(self.path + "/plugin/wuvorbis.dll.bak"):
+            shutil.copy(self.path + "/plugin/wuvorbis.dll.bak", self.path + "/plugin/wuvorbis.dll")
+            os.remove(self.path + "/plugin/wuvorbis.dll.bak")
+
+addrTools = {'tpm' : TpmAddr,
+             "dll" : DllAddr}
+def createAddrTool(path):
+    return addrTools[option["addr_method"]](path)
+    
+
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -58,8 +92,8 @@ class Workflow:
 
     def getAddr(self):
         self.log("try to get export addr")
-        # copy !get_addr.tpm to target directory
-        shutil.copy("tools/!get_addr.tpm", os.path.split(self.fileName)[0])
+        addrTool = createAddrTool(self.fileName)
+        addrTool.setup()
         # start target
         proc = subprocess.Popen(self.fileName.encode('mbcs'))
         self.log("target process started[pid:%d]" % proc.pid)
@@ -80,8 +114,7 @@ class Workflow:
         socket.send(req.SerializeToString())
         proc.wait() 
         socket.close()
-        # remove tpm file
-        os.remove(os.path.split(self.fileName)[0] + "/!get_addr.tpm")
+        addrTool.rollback()
         return addr
 
     def injectDll(self): 
