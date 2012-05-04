@@ -7,6 +7,8 @@
 using namespace std;
 
 const int kPathLen = 1024;
+const int kDummyCutCount = 8 * 1024;
+bool png_dummy_cut = false;
 
 int onStart_dumper(void*);
 /// Entry Point
@@ -117,6 +119,12 @@ static int extract_file(int id, int total,
         SaveTLGToPng(wname, format_path(png_path.c_str()).c_str());
         return 0;
     }
+
+    bool dummy_cut = png_dummy_cut &&
+        len > 3 &&
+        name[len-3] == 'p' &&
+        name[len-2] == 'n' &&
+        name[len-1] == 'g';
     
     ExFileRAII holder;
     IStream * st = TVPCreateIStream(ttstr(wname), TJS_BS_READ);
@@ -143,6 +151,8 @@ static int extract_file(int id, int total,
     }
     holder.hFile = hFile;
     ULONG size, os, tmp;
+    unsigned int last_eql_cnt = 0;
+    char last_char = 0;
     static char buffer[1024 * 64];
     
     while (now < ss) {	
@@ -157,6 +167,17 @@ static int extract_file(int id, int total,
         while (tmp < size) {
             WriteFile(hFile, buffer, size, &os, NULL);
             tmp += os;
+        }
+        if (dummy_cut) {
+            for (int i = 0; i < size; ++i)
+                if (buffer[i] != last_char) {
+                    last_eql_cnt = 1;
+                    last_char = buffer[i];
+                } else {
+                    ++ last_eql_cnt;
+                }
+            if (last_eql_cnt >= kDummyCutCount)
+                break;
         }
     }
     return 0;
@@ -247,6 +268,11 @@ int onStart_dumper(void*) {
                 break;
             case xp3::Request::ALLOC_CONSOLE:
                 make_console();
+                send_res(responder, res);
+                break;
+            case xp3::Request::PNG_DUMMY_CUT:
+                printf("enable dummy cut\n");
+                png_dummy_cut = true;
                 send_res(responder, res);
                 break;
             default:

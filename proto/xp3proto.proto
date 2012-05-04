@@ -10,6 +10,7 @@ message Request {
 	INIT_PNG_PLUGIN = 3;
 	EXTRACT_FILE = 4;
 	ALLOC_CONSOLE = 5;
+        PNG_DUMMY_CUT = 6;
   }
   
   required RequestType type = 1;

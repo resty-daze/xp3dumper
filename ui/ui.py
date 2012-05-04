@@ -24,7 +24,13 @@ class MainFrame(wx.Frame):
 
         self.addrChkBox = wx.CheckBox(self, label = "Get address by replace wuvorbis.dll")
         self.sizerBack.Add(self.addrChkBox)
+
+        self.dummyPngChkBox = wx.CheckBox(self, label = "Cut dummy png.dll")
+        self.sizerBack.Add(self.dummyPngChkBox)
         
+#        self.skipDummyFileChkBox = wx.CheckBox(self, label= "Skip dummy file name")
+#        self.sizerBack.Add(self.skipDummyFileChkBox)
+
         self.startButton = wx.Button(self, label = "Start")
         self.Bind(wx.EVT_BUTTON, self.OnStart, self.startButton)
         self.sizerBack.Add(self.startButton)
@@ -53,6 +59,8 @@ class MainFrame(wx.Frame):
                     xp3start.option["addr_method"] = "dll"
                 else:
                     xp3start.option["addr_method"] = "tpm"
+                xp3start.option["dummy_png"] = self.dummyPngChkBox.GetValue()
+#                xp3start.option["dummy_file"] = self.skipDummyFileChkBox.GetValue()
                 xp3start.start(fileName, self.pathTxt.GetValue(), self.addLog, self.alert)
             except Exception as e:
                 self.addLog("process failed.")

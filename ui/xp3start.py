@@ -80,6 +80,11 @@ class Workflow:
         req.type  = xp3proto_pb2.Request.ALLOC_CONSOLE
         self.socket.send(req.SerializeToString())
         self.socket.recv()
+        # for dummy png
+        if ("dummy_png" in option) and option["dummy_png"]:
+            req.type = xp3proto_pb2.Request.PNG_DUMMY_CUT
+            self.socket.send(req.SerializeToString())
+            self.socket.recv()
         # check png dll
         self.checkPngDll()
         # dump file

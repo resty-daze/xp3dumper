@@ -11,7 +11,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = descriptor.FileDescriptor(
   name='xp3proto.proto',
   package='xp3',
-  serialized_pb='\n\x0exp3proto.proto\x12\x03xp3\"\x82\x02\n\x07Request\x12&\n\x04type\x18\x01 \x02(\x0e\x32\x18.xp3.Request.RequestType\x12\x0f\n\x07\x65xpAddr\x18\x02 \x01(\x05\x12\x15\n\rfileToExtract\x18\x03 \x03(\t\x12\x13\n\x0b\x65xtractPath\x18\x04 \x01(\t\x12\x15\n\rpngPluginPath\x18\x05 \x01(\t\"{\n\x0bRequestType\x12\x08\n\x04\x45XIT\x10\x00\x12\x13\n\x0fGET_EXPORT_ADDR\x10\x01\x12\x13\n\x0fSET_EXPORT_ADDR\x10\x02\x12\x13\n\x0fINIT_PNG_PLUGIN\x10\x03\x12\x10\n\x0c\x45XTRACT_FILE\x10\x04\x12\x11\n\rALLOC_CONSOLE\x10\x05\"@\n\x08Response\x12\x0e\n\x06retVal\x18\x01 \x02(\x05\x12\x0f\n\x07\x65xpAddr\x18\x02 \x01(\x05\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\tB\x02H\x03')
+  serialized_pb='\n\x0exp3proto.proto\x12\x03xp3\"\x96\x02\n\x07Request\x12&\n\x04type\x18\x01 \x02(\x0e\x32\x18.xp3.Request.RequestType\x12\x0f\n\x07\x65xpAddr\x18\x02 \x01(\x05\x12\x15\n\rfileToExtract\x18\x03 \x03(\t\x12\x13\n\x0b\x65xtractPath\x18\x04 \x01(\t\x12\x15\n\rpngPluginPath\x18\x05 \x01(\t\"\x8e\x01\n\x0bRequestType\x12\x08\n\x04\x45XIT\x10\x00\x12\x13\n\x0fGET_EXPORT_ADDR\x10\x01\x12\x13\n\x0fSET_EXPORT_ADDR\x10\x02\x12\x13\n\x0fINIT_PNG_PLUGIN\x10\x03\x12\x10\n\x0c\x45XTRACT_FILE\x10\x04\x12\x11\n\rALLOC_CONSOLE\x10\x05\x12\x11\n\rPNG_DUMMY_CUT\x10\x06\"@\n\x08Response\x12\x0e\n\x06retVal\x18\x01 \x02(\x05\x12\x0f\n\x07\x65xpAddr\x18\x02 \x01(\x05\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\tB\x02H\x03')
 
 
 
@@ -45,11 +45,15 @@ _REQUEST_REQUESTTYPE = descriptor.EnumDescriptor(
       name='ALLOC_CONSOLE', index=5, number=5,
       options=None,
       type=None),
+    descriptor.EnumValueDescriptor(
+      name='PNG_DUMMY_CUT', index=6, number=6,
+      options=None,
+      type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=159,
-  serialized_end=282,
+  serialized_start=160,
+  serialized_end=302,
 )
 
 
@@ -106,7 +110,7 @@ _REQUEST = descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=24,
-  serialized_end=282,
+  serialized_end=302,
 )
 
 
@@ -147,8 +151,8 @@ _RESPONSE = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=284,
-  serialized_end=348,
+  serialized_start=304,
+  serialized_end=368,
 )
 
 _REQUEST.fields_by_name['type'].enum_type = _REQUEST_REQUESTTYPE
