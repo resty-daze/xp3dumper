@@ -39,8 +39,6 @@ addrTools = {'tpm' : TpmAddr,
              "dll" : DllAddr}
 def createAddrTool(path):
     return addrTools[option["addr_method"]](path)
-    
-
 
 def mkdir_p(path):
     try:
@@ -61,7 +59,7 @@ class Workflow:
         self.context = zmq.Context(1)
         addr = self.getAddr()
         self.log("export_addr:%x" % addr)
-        lists = getlist.getList()
+        lists = getlist.getList(self.path)
         if len(lists) == 0:
            self.log("Finished: file list is empty.")
            return False
@@ -166,6 +164,7 @@ class Workflow:
             self.log("load png dll [dll:%s][%s]" % (req.pngPluginPath, res.description))
 
 def start(fileName, path, log, alert):
+    getlist.log=log
     log("start to process. [Target:%s][Path:%s]" % (fileName, path))
     Workflow(fileName, path, log, alert).start()
     
