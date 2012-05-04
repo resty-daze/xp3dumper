@@ -31,9 +31,16 @@ class MainFrame(wx.Frame):
 #        self.skipDummyFileChkBox = wx.CheckBox(self, label= "Skip dummy file name")
 #        self.sizerBack.Add(self.skipDummyFileChkBox)
 
+        self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizerBack.Add(self.buttonSizer, 0, wx.EXPAND, 0)
+
         self.startButton = wx.Button(self, label = "Start")
         self.Bind(wx.EVT_BUTTON, self.OnStart, self.startButton)
-        self.sizerBack.Add(self.startButton)
+        self.buttonSizer.Add(self.startButton)
+
+        self.getExporterAddrButton = wx.Button(self, label = "Get exporter address")
+        self.Bind(wx.EVT_BUTTON, self.OnExprAddrButton)
+        self.buttonSizer.Add(self.getExporterAddrButton)
         
         #self.advanceButton = wx.Button(self, label = "I need advanced function")
         #self.Bind(wx.EVT_BUTTON, self.OnAdvanceStart, self.advanceButton)
@@ -73,12 +80,35 @@ class MainFrame(wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
+    def OnExprAddrButton(self, e):
+        self.disableButtons()
+        fileDlg = wx.FileDialog(self, message = "choose target exe:", wildcard = "*.exe")
+        ret = fileDlg.ShowModal()
+        if ret==wx.ID_OK:
+            fileName = fileDlg.GetPath()
+            fileDlg.Destroy()
+            try:
+                if self.addrChkBox.GetValue():
+                    xp3start.option["addr_method"] = "dll"
+                else:
+                    xp3start.option["addr_method"] = "tpm"
+                xp3start.option["dummy_png"] = self.dummyPngChkBox.GetValue()
+#                xp3start.option["dummy_file"] = self.skipDummyFileChkBox.GetValue()
+                addr = xp3start.get_addr(fileName, self.pathTxt.GetValue(), self.addLog, self.alert)
+                self.addLog("exporter_addr=%08x" % addr)
+            except Exception as e:
+                self.addLog("process failed.")
+                self.addLog(traceback.format_exc(5))
+        self.enableButtons()
+
     def disableButtons(self):
         self.startButton.Disable()
+        self.getExporterAddrButton.Disable()
         #self.advanceButton.Disable()
 
     def enableButtons(self):
         self.startButton.Enable()
+        self.getExporterAddrButton.Enable()
         #self.advanceButton.Enable()
     
     def addLog(self, msg):

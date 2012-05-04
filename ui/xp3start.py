@@ -55,8 +55,12 @@ class Workflow:
         self.alert = alert 
         self.path = path
     
-    def start(self):
+    def prepare(self):
         self.context = zmq.Context(1)
+        return self
+
+    def start(self):
+        self.prepare()
         addr = self.getAddr()
         self.log("export_addr:%x" % addr)
         lists = getlist.getList(self.path)
@@ -173,5 +177,8 @@ def start(fileName, path, log, alert):
     log("start to process. [Target:%s][Path:%s]" % (fileName, path))
     Workflow(fileName, path, log, alert).start()
     
-
+def get_addr(fileName, path, log, alert):
+    getlist.log=log
+    return Workflow(fileName, path, log, alert).prepare().getAddr()
+    
 
