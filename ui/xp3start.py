@@ -8,6 +8,8 @@ import time
 import xp3proto_pb2
 import getlist
 
+ZMQ_TIMEOUT = 5 * 1000 # 5s timeout for zmq socket
+
 option = {}
 
 class TpmAddr:
@@ -48,6 +50,8 @@ def mkdir_p(path):
             pass
         else: raise
 
+context = zmq.Context(1)
+
 class Workflow:
     def __init__(self, fileName, path, log, alert):
         self.fileName = fileName
@@ -56,8 +60,19 @@ class Workflow:
         self.path = path
     
     def prepare(self):
-        self.context = zmq.Context(1)
+        self.context = context
         return self
+
+    def recv(self):
+        poller = zmq.Poller()
+        poller.register(self.socket, zmq.POLLIN)
+        if poller.poll(ZMQ_TIMEOUT):
+            return self.socket.recv()
+        else:
+            raise IOError("Timeout when recv zmq message.")
+
+    def close_socket(self):
+        self.socket.close()
 
     def start(self):
         self.prepare()
@@ -72,23 +87,24 @@ class Workflow:
         # connect
         self.socket = self.context.socket(zmq.REQ)
         self.socket.connect("tcp://localhost:10010")
+        self.socket.setsockopt(zmq.LINGER, 0)
         # set exporter addr
         req = xp3proto_pb2.Request()
         res = xp3proto_pb2.Response()
         req.type = xp3proto_pb2.Request.SET_EXPORT_ADDR
         req.expAddr = addr
         self.socket.send(req.SerializeToString())
-        res.ParseFromString(self.socket.recv())
+        res.ParseFromString(self.recv())
         self.log("set exporter addr [retval:%d]" % res.retVal)
         # for debug
         req.type  = xp3proto_pb2.Request.ALLOC_CONSOLE
         self.socket.send(req.SerializeToString())
-        self.socket.recv()
+        self.recv()
         # for dummy png
         if ("dummy_png" in option) and option["dummy_png"]:
             req.type = xp3proto_pb2.Request.PNG_DUMMY_CUT
             self.socket.send(req.SerializeToString())
-            self.socket.recv()
+            self.recv()
         # check png dll
         self.checkPngDll()
         # dump file
@@ -96,31 +112,32 @@ class Workflow:
             self.dumpFileList(it[0], it[1])
         self.alert("Dump Finished")
         self.haltTarget()
+        return self
 
     def getAddr(self):
         self.log("try to get export addr")
         addrTool = createAddrTool(self.fileName)
         addrTool.setup()
         # start target
-        proc = subprocess.Popen(self.fileName.encode('mbcs'))
-        self.log("target process started[pid:%d]" % proc.pid)
+        self.proc = subprocess.Popen(self.fileName.encode('mbcs'))
+        self.log("target process started[pid:%d]" % self.proc.pid)
 
-        socket = self.context.socket(zmq.REQ)
-        socket.connect("tcp://localhost:10010")
+        self.socket = self.context.socket(zmq.REQ)
+        self.socket.connect("tcp://localhost:10010")
 
         req = xp3proto_pb2.Request()
         # request export addr
         req.type = xp3proto_pb2.Request.GET_EXPORT_ADDR
-        socket.send(req.SerializeToString())
+        self.socket.send(req.SerializeToString())
         res = xp3proto_pb2.Response()
-        res.ParseFromString(socket.recv())
+        res.ParseFromString(self.recv())
         addr = res.expAddr
         self.log("addr get")
         # request exit
         req.type = xp3proto_pb2.Request.EXIT
-        socket.send(req.SerializeToString())
-        proc.wait() 
-        socket.close()
+        self.socket.send(req.SerializeToString())
+        self.proc.wait() 
+        self.socket.close()
         addrTool.rollback()
         return addr
 
@@ -150,7 +167,7 @@ class Workflow:
         req.extractPath = dumpPath
         self.socket.send(req.SerializeToString())
         res = xp3proto_pb2.Response()
-        res.ParseFromString(self.socket.recv())
+        res.ParseFromString(self.recv())
         if res.retVal == 0:
             self.log("dump file list [%s] success" % fileName)
         else:
@@ -169,16 +186,19 @@ class Workflow:
             req.pngPluginPath = os.getcwd() + "\\tools\\layerExSave.dll"
             self.socket.send(req.SerializeToString())
             res = xp3proto_pb2.Response()
-            res.ParseFromString(self.socket.recv())
+            res.ParseFromString(self.recv())
             self.log("load png dll [dll:%s][%s]" % (req.pngPluginPath, res.description))
 
 def start(fileName, path, log, alert):
     getlist.log=log
     log("start to process. [Target:%s][Path:%s]" % (fileName, path))
-    Workflow(fileName, path, log, alert).start()
+    
+    try:
+        wf = Workflow(fileName, path, log, alert)
+        wf.start()
+    finally:
+        wf.haltTarget()
     
 def get_addr(fileName, path, log, alert):
     getlist.log=log
     return Workflow(fileName, path, log, alert).prepare().getAddr()
-    
-
