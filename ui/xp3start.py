@@ -167,7 +167,7 @@ class Workflow:
         req.extractPath = dumpPath
         self.socket.send(req.SerializeToString())
         res = xp3proto_pb2.Response()
-        res.ParseFromString(self.recv())
+        res.ParseFromString(self.socket.recv())
         if res.retVal == 0:
             self.log("dump file list [%s] success" % fileName)
         else:
