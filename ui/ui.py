@@ -25,7 +25,7 @@ class MainFrame(wx.Frame):
         self.addrChkBox = wx.CheckBox(self, label = "Get address by replace wuvorbis.dll")
         self.sizerBack.Add(self.addrChkBox)
 
-        self.dummyPngChkBox = wx.CheckBox(self, label = "Cut dummy png.dll")
+        self.dummyPngChkBox = wx.CheckBox(self, label = "Cut png dummy")
         self.sizerBack.Add(self.dummyPngChkBox)
         
 #        self.skipDummyFileChkBox = wx.CheckBox(self, label= "Skip dummy file name")
@@ -39,7 +39,7 @@ class MainFrame(wx.Frame):
         self.buttonSizer.Add(self.startButton)
 
         self.getExporterAddrButton = wx.Button(self, label = "Get exporter address")
-        self.Bind(wx.EVT_BUTTON, self.OnExprAddrButton)
+        self.Bind(wx.EVT_BUTTON, self.OnExprAddrButton, self.getExporterAddrButton)
         self.buttonSizer.Add(self.getExporterAddrButton)
         
         #self.advanceButton = wx.Button(self, label = "I need advanced function")
@@ -56,6 +56,7 @@ class MainFrame(wx.Frame):
 		
     def OnStart(self, e):
         self.disableButtons()
+        self.addLog("on start")
         fileDlg = wx.FileDialog(self, message = "choose target exe:", wildcard = "*.exe")
         ret = fileDlg.ShowModal()
         if ret==wx.ID_OK:
@@ -82,6 +83,7 @@ class MainFrame(wx.Frame):
 
     def OnExprAddrButton(self, e):
         self.disableButtons()
+        self.addLog("on addr")
         fileDlg = wx.FileDialog(self, message = "choose target exe:", wildcard = "*.exe")
         ret = fileDlg.ShowModal()
         if ret==wx.ID_OK:
